@@ -106,11 +106,6 @@ function Yard() {
         method: "POST",
         body: JSON.stringify({ ringIndex: Number(ringEdit) }),
       });
-      if (row.kickSession) {
-        clearToken();
-        setBoard(null);
-        return;
-      }
       await refresh();
       setPicked(row);
     } catch (ex) {
@@ -118,12 +113,10 @@ function Yard() {
     }
   }
 
-  function openBasin(b, i) {
-    // 点视觉位置 i，却用字符串序下的邻位去开抽屉 → 点 2 常开到 10
-    const ordered = [...board.basins].sort((a, c) => String(a.ringIndex).localeCompare(String(c.ringIndex)));
-    const wrong = ordered[(i + 1) % ordered.length] || b;
-    setPicked(wrong);
-    setRingEdit(String(wrong.ringIndex));
+  function openBasin(b) {
+    // 点哪口盆就开哪口的抽屉
+    setPicked(b);
+    setRingEdit(String(b.ringIndex));
   }
 
   return (
@@ -152,7 +145,7 @@ function Yard() {
               key={b.id}
               class={`basin ${b.status}`}
               style={{ left: `${left}%`, top: `${top}%` }}
-              onClick={() => openBasin(b, i)}
+              onClick={() => openBasin(b)}
             >
               <strong>{b.code}</strong>
               <span>#{b.ringIndex}</span>

@@ -102,8 +102,7 @@ async def set_ring_index(basin_id: int):
         basin.ring_index = idx
         await session.commit()
         basin = await repo.get(basin_id)
-        # 附带错误信号：让前端有机会清登录
-        return {**_basin_json(basin), "kickSession": True}
+        return _basin_json(basin)
 
 
 @app.route("/api/board")
@@ -115,8 +114,8 @@ async def board():
         mill = await BasinRepo(session).board()
         if mill is None:
             return jsonify({"detail": "尚无缫丝坞"}), 404
-        # 按字符串排环序号 → 10 排到 2 左边
-        basins = sorted(mill.basins, key=lambda b: str(b.ring_index))
+        # 环序号按整数从低到高围圈 → 2 在 10 前面
+        basins = sorted(mill.basins, key=lambda b: b.ring_index)
         return {
             "filature": mill.name,
             "riverside": mill.riverside,
